@@ -11,9 +11,11 @@ router.post(
   [
     body("name")
       .trim()
+      .notEmpty()
+      .withMessage("Name must have!")
       .isLength({ min: 3 })
       .withMessage("Name must have at least three characters!"),
-    body("password").trim().isEmpty().withMessage("Password must have!"),
+    body("password").trim().notEmpty().withMessage("Password must have!"),
     body("email").trim().isEmail().withMessage("Enter valid email address!"),
   ],
   authController.register
@@ -24,7 +26,7 @@ router.post(
 router.post(
   "/login",
   [
-    body("password").trim().isEmpty().withMessage("Password must have!"),
+    body("password").trim().notEmpty().withMessage("Password must have!"),
     body("email").trim().isEmail().withMessage("Enter valid email address!"),
   ],
   authController.login

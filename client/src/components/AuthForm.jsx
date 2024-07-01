@@ -1,9 +1,41 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import FormItem from "antd/es/form/FormItem";
+import { loginUser, registerUser } from "../api_calls/auth";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const AuthForm = ({ isLoginPage }) => {
+  const [submitting, setSubmitting] = useState(false);
+
   const handleOnFinish = async (values) => {
-    console.log(values);
+    setSubmitting(true);
+
+    if (isLoginPage) {
+      try {
+        const response = await loginUser(values);
+        if (response.isSuccess) {
+          message.success(response.message);
+          localStorage.setItem("token", response.token);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (err) {
+        message.error(err.message);
+      }
+    } else {
+      try {
+        const response = await registerUser(values);
+        if (response.isSuccess) {
+          message.success(response.message);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (err) {
+        message.error(err.message);
+      }
+    }
+
+    setSubmitting(false);
   };
 
   return (
@@ -21,6 +53,10 @@ const AuthForm = ({ isLoginPage }) => {
                 {
                   required: true,
                   message: "Name must be include!",
+                },
+                {
+                  min: 3,
+                  message: "Name must have three characters!",
                 },
               ]}
               hasFeedback
@@ -63,9 +99,32 @@ const AuthForm = ({ isLoginPage }) => {
 
           <FormItem>
             <Button type="primary" htmlType="submit">
-              Register
+              {isLoginPage && !submitting && "Login"}
+              {!isLoginPage && !submitting && "Register"}
+
+              {submitting && "Submitting"}
             </Button>
           </FormItem>
+
+          <p>
+            {" "}
+            {isLoginPage ? (
+              <p>
+                {" "}
+                Don't have an account ?{" "}
+                <Link to={"/register"} className="font-medium text-teal-600">
+                  Register Here!
+                </Link>{" "}
+              </p>
+            ) : (
+              <p>
+                Already have an account ?{" "}
+                <Link to={"/login"} className="font-medium text-teal-600">
+                  Login Here!
+                </Link>
+              </p>
+            )}{" "}
+          </p>
         </Form>
       </div>
     </section>

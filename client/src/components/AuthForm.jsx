@@ -3,9 +3,12 @@ import FormItem from "antd/es/form/FormItem";
 import { loginUser, registerUser } from "../api_calls/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUserId } from "../store/slice/userSlice";
 
 const AuthForm = ({ isLoginPage }) => {
   const [submitting, setSubmitting] = useState(false);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleOnFinish = async (values) => {
@@ -17,6 +20,7 @@ const AuthForm = ({ isLoginPage }) => {
         if (response.isSuccess) {
           message.success(response.message);
           localStorage.setItem("token", response.token);
+          dispatch(setUserId(response.token));
           navigate("/");
         } else {
           throw new Error(response.message);

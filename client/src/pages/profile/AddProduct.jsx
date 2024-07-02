@@ -1,9 +1,12 @@
 import React from "react";
-import { Checkbox, Col, Form, Input, Row, Select } from "antd";
+import { Checkbox, Col, Form, Input, Row, Select, message } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { SquaresPlusIcon } from "@heroicons/react/24/solid";
+import { sellProduct } from "../../api_calls/product";
 
-const AddProduct = () => {
+const AddProduct = ({ setActiveTabKey }) => {
+  const [form] = Form.useForm();
+
   const categoriesOptions = [
     {
       value: "clothing_and_fashion",
@@ -50,12 +53,27 @@ const AddProduct = () => {
     },
   ];
 
+  const onFinishHandler = async (values) => {
+    try {
+      const response = await sellProduct(values);
+      if (response.isSuccess) {
+        message.success(response.message);
+        form.resetFields();
+        setActiveTabKey("1");
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (err) {
+      message.error(err.message);
+    }
+  };
+
   return (
     <section>
       <h1 className="text-xl font-extrabold my-5 text-red-600 ">
         WHAT YOU WANT TO SELL?
       </h1>
-      <Form layout="vertical">
+      <Form layout="vertical" onFinish={onFinishHandler} form={form}>
         <Form.Item
           name="product_name"
           label="Product Name"
@@ -140,7 +158,7 @@ const AddProduct = () => {
 
         <button
           className="font-medium text-lg text-center my-4 rounded-md flex items-end justify-center text-red-600 bg-gray-50 shadow-md gap-2 p-2 w-full"
-          type="button"
+          type="submit"
         >
           <SquaresPlusIcon width={30} />
           Sell

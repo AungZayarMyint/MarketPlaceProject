@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const getFreshLocalStorage = () => {
-  return localStorage.getItem("token");
+  const refreshToken = localStorage.getItem("token");
+  return refreshToken;
 };
 
 export const axiosInstance = axios.create({
